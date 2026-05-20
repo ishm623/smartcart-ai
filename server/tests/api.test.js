@@ -1,5 +1,15 @@
 const request = require("supertest");
-const app = require("../index");
+const app = require("../app");
+
+let server;
+
+beforeAll(() => {
+  server = app.listen(0);
+});
+
+afterAll((done) => {
+  server.close(done);
+});
 
 describe("API Tests", () => {
 
