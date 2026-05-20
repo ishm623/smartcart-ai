@@ -46,6 +46,10 @@ app.get("/products", (req, res) => {
   res.json(products);
 });
 
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "UP" });
+});
+
 const PORT = 3001;
 
 app.listen(PORT, () => {
