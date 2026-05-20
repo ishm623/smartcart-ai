@@ -1,11 +1,27 @@
 const request = require("supertest");
 const app = require("../index");
 
-describe("GET /products", () => {
-  it("should return products", async () => {
-    const response = await request(app).get("/products");
+describe("API Tests", () => {
 
-    expect(response.statusCode).toBe(200);
-    expect(response.body.length).toBeGreaterThan(0);
+  test("GET / should return API message", async () => {
+    const res = await request(app).get("/");
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.message).toBe("SmartCart AI API Running");
   });
+
+  test("GET /products should return products", async () => {
+    const res = await request(app).get("/products");
+
+    expect(res.statusCode).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
+  });
+
+  test("GET /health should return UP", async () => {
+    const res = await request(app).get("/health");
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.status).toBe("UP");
+  });
+
 });

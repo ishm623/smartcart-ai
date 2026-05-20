@@ -4,29 +4,52 @@ const cors = require("cors");
 const app = express();
 
 app.use(cors());
-app.use(express.json());
+
+const products = [
+  {
+    id: 1,
+    name: "AirPods Pro",
+    category: "Electronics",
+    currentPrice: 350,
+    predictedPrice: 315
+  },
+  {
+    id: 2,
+    name: "PlayStation 5",
+    category: "Gaming",
+    currentPrice: 799,
+    predictedPrice: 749
+  },
+  {
+    id: 3,
+    name: "iPhone 15",
+    category: "Mobile",
+    currentPrice: 1499,
+    predictedPrice: 1399
+  },
+  {
+    id: 4,
+    name: "MacBook Air M3",
+    category: "Laptop",
+    currentPrice: 1899,
+    predictedPrice: 1799
+  }
+];
 
 app.get("/", (req, res) => {
-  res.json({ message: "SmartCart AI API Running" });
+  res.json({
+    message: "SmartCart AI API Running"
+  });
 });
 
 app.get("/products", (req, res) => {
-  res.json([
-    {
-      id: 1,
-      name: "AirPods Pro",
-      currentPrice: 350,
-      predictedPrice: 315
-    }
-  ]);
+  res.json(products);
 });
 
 const PORT = 3001;
 
-if (process.env.NODE_ENV !== "test") {
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
-}
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
 module.exports = app;
