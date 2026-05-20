@@ -65,6 +65,8 @@ pipeline {
             steps {
                 sh '''
                 sleep 10
+                docker ps
+                docker logs smartcart-ai
                 curl http://localhost:3001/health
                 '''
             }
