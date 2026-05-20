@@ -34,8 +34,17 @@ pipeline {
         stage('Run Container') {
             steps {
                 sh '''
+                echo "Checking and freeing port 3001..."
+
+                # Stop container by name
                 docker stop smartcart-ai || true
                 docker rm smartcart-ai || true
+
+                # kill anything using port 3001
+                lsof -ti :3001 | xargs kill -9 || true
+
+                echo "Starting fresh container..."
+
                 docker run -d --name smartcart-ai -p 3001:3001 smartcart-ai
                 '''
             }
