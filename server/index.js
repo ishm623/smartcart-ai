@@ -50,10 +50,12 @@ app.get("/health", (req, res) => {
   res.status(200).json({ status: "UP" });
 });
 
-const PORT = 3001;
+const app = require("./app");
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+if (require.main === module) {
+  app.listen(3001, () => {
+    console.log("Server running on port 3001");
+  });
+}
 
 module.exports = app;
