@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 
 app.get("/", (req, res) => {
-  res.json({ message: "API is working" });
+  res.json({ message: "SmartCart AI API Running" });
 });
 
 app.get("/products", (req, res) => {
