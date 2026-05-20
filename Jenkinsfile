@@ -42,11 +42,12 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                script {
-                    def scannerHome = tool 'SonarScanner'
-                    withSonarQubeEnv('SonarQube') {
-                        sh "${scannerHome}/bin/sonar-scanner"
-                    }
+                withSonarQubeEnv('SonarQube') {
+                    sh '''
+                    export JAVA_HOME=/Library/Java/JavaVirtualMachines/openjdk-17.jdk/Contents/Home
+                    export PATH=$JAVA_HOME/bin:$PATH
+                    sonar-scanner
+                    '''
                 }
             }
         }
