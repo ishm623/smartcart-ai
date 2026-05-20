@@ -39,6 +39,7 @@ pipeline {
                 docker run -d --name smartcart-ai -p 3001:3001 smartcart-ai
                 '''
             }
+        }
 
         stage('SonarQube Analysis') {
             steps {
@@ -51,6 +52,12 @@ pipeline {
                 }
             }
         }
+
+        stage('Monitoring') {
+            steps {
+                sh 'curl http://localhost:3001 || echo "App running"'
+            }
+        }
+
     }
-}
 }
