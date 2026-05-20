@@ -33,9 +33,12 @@ pipeline {
 
         stage('Run Container') {
             steps {
-                sh 'docker run -d -p 3001:3001 smartcart-ai || true'
+                sh '''
+                docker stop smartcart-ai || true
+                docker rm smartcart-ai || true
+                docker run -d --name smartcart-ai -p 3001:3001 smartcart-ai
+                '''
             }
-        }
 
         stage('SonarQube Analysis') {
             steps {
