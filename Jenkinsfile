@@ -63,9 +63,18 @@ pipeline {
 
         stage('Monitoring') {
             steps {
-                sh 'curl http://localhost:3001 || echo "App running"'
+                sh '''
+                sleep 10
+                curl http://localhost:3001/health
+                '''
             }
         }
+
+        stage('Security Scan') {
+            steps {
+                sh 'npm audit --audit-level=high'
+            }
+}
 
     }
 }
