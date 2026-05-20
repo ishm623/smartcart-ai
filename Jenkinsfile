@@ -51,12 +51,13 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
+                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
                     sh '''
-                    export JAVA_HOME=/Library/Java/JavaVirtualMachines/openjdk-17.jdk/Contents/Home
-                    export PATH=$JAVA_HOME/bin:$PATH
-                    sonar-scanner
+                    sonar-scanner \
+                    -Dsonar.login=$SONAR_TOKEN
                     '''
                 }
+            }
             }
         }
 
