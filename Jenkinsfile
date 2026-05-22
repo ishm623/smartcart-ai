@@ -46,7 +46,7 @@ pipeline {
                     withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
                         sh '''
                         sonar-scanner \
-                        -Dsonar.projectKey=HD \
+                        -Dsonar.projectKey=${JOB_NAME} \
                         -Dsonar.token=$SONAR_TOKEN
                         '''
                     }
@@ -65,11 +65,11 @@ pipeline {
         stage('Security Scan') {
             steps {
                 dir('server') {
-                    sh 'npm audit --audit-level=high || true'
+                    sh 'npm audit --audit-level=high'
                 }
 
                 sh """
-                docker scout quickview ${IMAGE_NAME}:latest || true
+                docker scout quickview ${IMAGE_NAME}:latest
                 """
             }
         }
@@ -77,17 +77,22 @@ pipeline {
         stage('Deploy to Staging') {
             steps {
                 sh """
-                echo "Checking Docker..."
-
-                docker info || exit 1
-
                 docker stop ${CONTAINER_NAME} || true
                 docker rm ${CONTAINER_NAME} || true
+                docker run -d --name ${CONTAINER_NAME} -p 3001:3001 ${IMAGE_NAME}:latest
+                """
+            }
+        }
 
-                docker run -d \
-                    --name ${CONTAINER_NAME} \
-                    -p 3001:3001 \
-                    ${IMAGE_NAME}:latest
+        stage('Release') {
+            steps {
+                echo "Creating release version of image..."
+
+                sh """
+                docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:release
+                docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:v${BUILD_NUMBER}
+
+                echo "Release tags created successfully"
                 """
             }
         }
@@ -105,25 +110,13 @@ pipeline {
                 docker logs ${CONTAINER_NAME}
 
                 echo "Health check:"
-                curl http://localhost:3001/health || true
-                """
-            }
-        }
-
-        stage('Release') {
-            when {
-                branch 'main'
-            }
-            steps {
-                sh """
-                git tag v1.${BUILD_NUMBER} || true
+                curl http://localhost:3001/health
                 """
             }
         }
     }
 
     post {
-
         success {
             echo 'Pipeline completed successfully!'
         }
