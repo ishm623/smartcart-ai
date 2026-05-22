@@ -33,10 +33,10 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh '''
+                sh """
                 docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
                 docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest
-                '''
+                """
             }
         }
 
@@ -45,11 +45,11 @@ pipeline {
                 withSonarQubeEnv('SonarQube') {
                     withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
 
-                        sh '''
+                        sh """
                         sonar-scanner \
                         -Dsonar.projectKey=HD \
-                        -Dsonar.login=$SONAR_TOKEN
-                        '''
+                        -Dsonar.token=$SONAR_TOKEN
+                        """
                     }
                 }
             }
@@ -65,12 +65,13 @@ pipeline {
 
         stage('Security Scan') {
             steps {
+
                 dir('server') {
                     sh 'npm audit --audit-level=high'
                 }
 
                 sh '''
-                docker scout quickview ${IMAGE_NAME}:${IMAGE_TAG} || true
+                docker scout quickview ${IMAGE_NAME}:latest || true
                 '''
             }
         }
@@ -85,12 +86,10 @@ pipeline {
                 docker stop ${CONTAINER_NAME} || true
                 docker rm ${CONTAINER_NAME} || true
 
-                lsof -ti :3001 | xargs kill -9 || true
-
                 docker run -d \
                     --name ${CONTAINER_NAME} \
                     -p 3001:3001 \
-                    ${IMAGE_NAME}:${IMAGE_TAG}
+                    ${IMAGE_NAME}:latest
                 '''
             }
         }
@@ -114,14 +113,14 @@ pipeline {
         }
 
         stage('Release') {
+
+            when {
+                branch 'main'
+            }
+
             steps {
                 sh '''
-                echo "Creating release tag..."
-
-                git tag release-${IMAGE_TAG} || true
-
-                echo "Release version:"
-                echo ${IMAGE_TAG}
+                git tag v1.${BUILD_NUMBER} || true
                 '''
             }
         }
@@ -139,7 +138,6 @@ pipeline {
 
         always {
             echo 'Cleaning workspace...'
-
             cleanWs()
         }
     }
