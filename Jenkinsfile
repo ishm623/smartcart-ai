@@ -67,10 +67,6 @@ pipeline {
                 dir('server') {
                     sh 'npm audit --audit-level=high'
                 }
-
-                sh """
-                docker scout quickview ${IMAGE_NAME}:latest
-                """
             }
         }
 
