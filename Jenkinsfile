@@ -46,7 +46,7 @@ pipeline {
                     withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
                         sh '''
                         sonar-scanner \
-                        -Dsonar.projectKey=${JOB_NAME} \
+                        -Dsonar.projectKey=HD \
                         -Dsonar.token=$SONAR_TOKEN
                         '''
                     }
